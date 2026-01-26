@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kelola Kelas</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Kelola Kelas</h2>
+      <button onclick="location.href='../dashboard/admin.html'">Kembali</button>
+    </div>
+
+    <div class="card">
+      <h3>Anggota Kelas</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Role</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="anggotaList">
+            <!-- Anggota muncul di sini -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+<!-- Materi -->
+<div class="card">
+  <h3>Daftar Materi</h3>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Judul</th>
+          <th>Pelajaran</th>
+          <th>Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="materiList"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Try Out -->
+<div class="card">
+  <h3>Daftar Try Out</h3>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Judul</th>
+          <th>Pelajaran</th>
+          <th>Durasi</th>
+          <th>Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tryoutList"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Latihan -->
+<div class="card">
+  <h3>Daftar Latihan</h3>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Judul</th>
+          <th>Pelajaran</th>
+          <th>Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="latihanList"></tbody>
+    </table>
+  </div>
+</div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Tambah Guru ke Kelas</h3>
+        <div id="guruCheckboxes" class="checkbox-list"></div>
+        <button onclick="tambahGuru()">Tambah Guru</button>
+      </div>
+
+      <div class="card">
+        <h3>Tambah Siswa ke Kelas</h3>
+        <div id="siswaCheckboxes" class="checkbox-list"></div>
+        <button onclick="tambahSiswa()">Tambah Siswa</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/kelas.js"></script>
+</body>
+</html>

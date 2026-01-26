@@ -1,0 +1,25 @@
+<h4>Hasil Latihan Siswa</h4>
+<div class="mb-3">
+  <select id="kelasFilter" class="form-select mb-2">
+    <option value="">-- Semua Kelas --</option>
+  </select>
+  <select id="materiFilter" class="form-select">
+    <option value="">-- Semua Materi --</option>
+  </select>
+</div>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Siswa</th>
+      <th>Materi</th>
+      <th>Jawaban</th>
+      <th>Skor</th>
+      <th>Waktu</th>
+    </tr>
+  </thead>
+  <tbody id="hasilTable"></tbody>
+</table>
+
+<script type="module" src="../assets/js/firebase.js"></script>
+<script type="module" src="js/auth-admin.js"></script>
+<script type="module" src="js/hasil_latihan.js"></script>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="container">
+    
+    <!-- HEADER -->
+    <div class="header">
+      <h2>Admin Panel</h2>
+      <button id="logoutBtn">Logout</button>
+    </div>
+
+    <!-- IMPORT AKUN -->
+    <div class="card">
+      <h3>Import Akun (Excel)</h3>
+      <div class="form-row">
+        <input type="file" id="excelFile" accept=".xlsx, .xls">
+        <button id="importBtn">Import Excel</button>
+      </div>
+      <p id="importStatus"></p>
+    </div>
+
+    <!-- AKUN MENUNGGU PERSUTUJUAN -->
+    <div class="card">
+      <h3>Akun Menunggu Persetujuan</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Role</th>
+              <th>Email</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="userList"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AKUN AKTIF -->
+    <div class="card">
+      <h3>Akun Aktif</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Role</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="activeUserList"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BUAT KELAS -->
+    <div class="card">
+      <h3>Buat Kelas</h3>
+      <form id="kelasForm" class="kelas-form">
+        <div class="form-group">
+          <label for="kelasNama">Nama Kelas</label>
+          <input type="text" id="kelasNama" placeholder="Contoh: X IPA 1">
+        </div>
+        <div class="form-group">
+          <label for="kelasTingkat">Tingkat</label>
+          <input type="text" id="kelasTingkat" placeholder="Contoh: X">
+        </div>
+        <div class="form-group">
+          <label for="kelasTahun">Tahun Ajaran</label>
+          <input type="text" id="kelasTahun" placeholder="Contoh: 2025/2026">
+        </div>
+        <div class="form-group form-action">
+          <button type="button" onclick="buatKelas()">Buat Kelas</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- DAFTAR KELAS -->
+    <div class="card">
+      <h3>Daftar Kelas</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Tingkat</th>
+              <th>Tahun Ajaran</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="kelasList"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- IMPORT TRYOUT -->
+    <div class="card">
+      <h3>Import Try Out (JSON)</h3>
+      <div class="form-row">
+        <input type="file" id="tryoutJsonFile" accept=".json">
+        <button onclick="importTryOutJSON()">Import JSON</button>
+      </div>
+    </div>
+
+    <!-- DAFTAR TRYOUT -->
+    <div class="card">
+      <h3>Daftar Try Out</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Judul</th>
+              <th>Pelajaran</th>
+              <th>Kelas</th>
+              <th>Durasi (menit)</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tryoutList"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- IMPORT LATIHAN -->
+    <div class="card">
+      <h3>Import Latihan (JSON)</h3>
+      <div class="form-row">
+        <input type="file" id="latihanJsonFile" accept=".json">
+        <button onclick="importLatihanJSON()">Import JSON</button>
+      </div>
+    </div>
+
+    <!-- DAFTAR LATIHAN -->
+    <div class="card">
+      <h3>Daftar Latihan</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Judul</th>
+              <th>Pelajaran</th>
+              <th>Kelas</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="latihanList"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="../js/admin.js"></script>
+</body>
+</html>

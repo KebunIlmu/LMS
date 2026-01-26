@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- Tombol toggle MOBILE -->
+<button id="toggleSidebar" class="btn btn-outline-primary d-md-none m-2">
+  ☰
+</button>
+
+<!-- OVERLAY -->
+<div id="overlay"></div>
+
+<div class="admin-wrapper">
+
+  <!-- SIDEBAR LANGSUNG -->
+  <div class="sidebar">
+
+    <div class="sidebar-header">
+      <span class="logo">LMS Admin</span>
+    </div>
+
+    <ul class="menu">
+      <li><a href="dashboard.html" class="active">🏠 Dashboard</a></li>
+      <li><a href="users.html">👥 Akun</a></li>
+      <li><a href="classes.html">🏫 Kelas</a></li>
+      <li><a href="materi.html">📚 Materi</a></li>
+      <li><a href="laporan.html">📊 Laporan</a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <a href="../index.html">🚪 Logout</a>
+    </div>
+
+  </div>
+
+  <!-- KONTEN -->
+  <div class="content">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">Dashboard Admin</h3>
+  </div>
+
+  <p class="text-muted">Selamat datang di panel admin LMS</p>
+
+  <div class="row mt-4 g-3">
+
+    <div class="row g-4 mt-4">
+
+  <div class="col-md-3 col-6">
+    <div class="clean-card">
+      <div class="card-title">Total Siswa</div>
+      <div class="card-value" id="totalSiswa">0</div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-6">
+    <div class="clean-card">
+      <div class="card-title">Total Guru</div>
+      <div class="card-value" id="totalGuru">0</div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-6">
+    <div class="clean-card">
+      <div class="card-title">Akun Aktif</div>
+      <div class="card-value success" id="akunAktif">0</div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-6">
+    <div class="clean-card">
+      <div class="card-title">Nonaktif</div>
+      <div class="card-value warning" id="akunNonaktif">0</div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-6">
+  <div class="clean-card">
+    <div class="card-title">Kelas Aktif</div>
+    <div class="card-value success" id="kelasAktif">0</div>
+  </div>
+</div>
+
+<div class="col-md-3 col-6">
+  <div class="clean-card">
+    <div class="card-title">Kelas Nonaktif</div>
+    <div class="card-value warning" id="kelasNonaktif">0</div>
+  </div>
+</div>
+
+</div>
+
+
+
+<script type="module" src="../assets/js/firebase.js"></script>
+<script type="module" src="js/auth-admin.js"></script>
+<script src="js/sidebar.js"></script>
+<script type="module" src="js/dashboard.js"></script>
+
+</body>
+</html>

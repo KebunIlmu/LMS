@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Try Out</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Try Out</h2>
+
+    <div id="selectTryoutDiv">
+      <label for="tryoutSelect">Pilih Try Out:</label>
+      <select id="tryoutSelect"></select>
+      <button id="startBtn">Mulai</button>
+    </div>
+
+    <div id="tryoutDiv" style="display:none">
+      <h3 id="tryoutTitle"></h3>
+      <p>Waktu tersisa: <span id="timer">00:00</span></p>
+      <form id="tryoutForm"></form>
+      <button id="submitBtn">Submit</button>
+    </div>
+
+    <div id="doneDiv" style="display:none">
+      <h3>Try Out Selesai</h3>
+      <button onclick="kembali()">Kembali</button>
+    </div>
+  </div>
+
+  <script type="module" src="../js/tryout.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Siswa</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- HEADER -->
+    <div class="header">
+      <h2>Panel Siswa</h2>
+      <button class="danger" id="logoutBtn">Logout</button>
+    </div>
+
+    <!-- PROFIL SISWA -->
+    <div class="card">
+      <h3>Profil Siswa</h3>
+      <p><strong>Nama:</strong> <span id="profilNama"></span></p>
+      <p><strong>Email:</strong> <span id="profilEmail"></span></p>
+      <p><strong>Kelas:</strong> <span id="profilKelas"></span></p>
+    </div>
+
+    <!-- PILIH TRYOUT -->
+    <div class="card">
+      <h3>Pilih Try Out</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Judul</th>
+              <th>Pelajaran</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="pilihTryoutList"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="../js/siswa.js"></script>
+</body>
+</html>

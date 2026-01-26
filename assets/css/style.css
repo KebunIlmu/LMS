@@ -1,0 +1,33 @@
+:root{
+  --primary:#0f766e;
+  --bg:#f0fdfa;
+  --card:#ffffff;
+  --text:#1e293b;
+  --muted:#64748b;
+  --radius:16px;
+  --shadow:0 8px 24px rgba(0,0,0,.08);
+}
+
+/* lanjutkan semua CSS kamu */
+
+/* ================= INPUT FORM ================= */
+.input{
+  width:100%;
+  padding:12px 14px;
+  border-radius:10px;
+  border:2px solid var(--primary);
+  font-size:14px;
+  outline:none;
+  background:#fff;
+  color:var(--text);
+  margin-bottom:10px;
+}
+
+.input::placeholder{
+  color:var(--muted);
+}
+
+.input:focus{
+  border-color:#0d9488;
+  box-shadow:0 0 0 3px #99f6e4;
+}

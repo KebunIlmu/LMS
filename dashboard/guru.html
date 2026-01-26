@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Guru</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Panel Guru</h2>
+      <button class="danger" id="logoutBtn">Logout</button>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- Materi -->
+      <div class="card">
+        <h3>Buat Materi</h3>
+        <input type="text" id="materiJudul" placeholder="Judul Materi">
+        <textarea id="materiKonten" placeholder="Deskripsi / Link / PDF" rows="4"></textarea>
+        <button onclick="buatMateri()">Buat Materi</button>
+      </div>
+
+      <!-- Latihan -->
+      <div class="card">
+        <h3>Buat Latihan</h3>
+        <input type="text" id="latihanJudul" placeholder="Judul Latihan">
+        <textarea id="latihanKonten" placeholder="Deskripsi / Soal" rows="4"></textarea>
+        <button onclick="buatLatihan()">Buat Latihan</button>
+
+        <hr style="margin:16px 0; border-color:#e5e7eb">
+
+        <h4>Import Latihan (JSON)</h4>
+        <input type="file" id="latihanJSON" accept=".json">
+        <button onclick="importLatihanJSON()">Import</button>
+        <p id="importLatihanStatus" style="font-size:13px; margin-top:8px;"></p>
+      </div>
+
+      <!-- Tryout -->
+      <div class="card">
+        <h3>Buat Tryout</h3>
+        <input type="text" id="tryoutJudul" placeholder="Judul Tryout">
+        <textarea id="tryoutKonten" placeholder="Deskripsi / Link" rows="4"></textarea>
+        <button onclick="buatTryout()">Buat Tryout</button>
+      </div>
+
+      <!-- Laporan -->
+      <div class="card full-width">
+        <h3>Laporan Latihan & Tryout</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Nama Siswa</th>
+                <th>Jenis</th>
+                <th>Skor</th>
+                <th>Tanggal</th>
+              </tr>
+            </thead>
+            <tbody id="laporanList"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="../js/guru.js"></script>
+</body>
+</html>

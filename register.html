@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrasi Akun</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+
+      <div class="card shadow-sm rounded-4 p-4">
+        <h4 class="text-center mb-3">Buat Akun</h4>
+
+        <form id="registerForm">
+
+          <div class="mb-3">
+            <label>Daftar sebagai</label>
+            <select id="role" class="form-select" required>
+              <option value="">-- Pilih --</option>
+              <option value="siswa">Siswa</option>
+              <option value="guru">Guru</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label>Nama Lengkap</label>
+            <input type="text" id="nama" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label>Email</label>
+            <input type="email" id="email" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label>Password</label>
+            <input type="password" id="password" class="form-control" required>
+          </div>
+
+          <!-- KHUSUS SISWA -->
+          <div id="siswaFields" style="display:none">
+            <div class="mb-3">
+              <label>NISN</label>
+              <input type="text" id="nisn" class="form-control">
+            </div>
+
+            <div class="mb-3">
+              <label>Kelas</label>
+              <input type="text" id="kelas" class="form-control">
+            </div>
+
+            <div class="mb-3">
+              <label>Sekolah</label>
+              <input type="text" id="sekolah" class="form-control">
+            </div>
+          </div>
+
+          <button class="btn btn-success w-100" type="submit">
+            Daftar
+          </button>
+
+          <p class="text-center mt-3">
+            Sudah punya akun?
+            <a href="index.html">Login</a>
+          </p>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="module" src="assets/js/firebase.js"></script>
+<script type="module" src="assets/js/register.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f6f9;
+}
+
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  background: #ffffff;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #0d6efd;
+  border-bottom: 1px solid #eee;
+}
+
+.menu {
+  list-style: none;
+  padding: 15px;
+  flex: 1;
+}
+
+.menu li {
+  margin-bottom: 8px;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #333;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.menu a:hover {
+  background: #eef3ff;
+  color: #0d6efd;
+}
+
+.menu a.active {
+  background: #0d6efd;
+  color: #fff;
+}
+
+.sidebar-footer {
+  padding: 15px;
+  border-top: 1px solid #eee;
+}
+
+.sidebar-footer a {
+  color: #dc3545;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* CONTENT */
+.content {
+  flex: 1;
+  padding: 25px;
+}
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+  z-index: 998;
+}
+
+#overlay.active {
+  display: block;
+}
+/* ================= CLEAN DASHBOARD ================= */
+
+body {
+  background: #f7f8fa;
+  color: #111827;
+}
+
+.clean-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.05);
+  transition: .2s ease;
+}
+
+.clean-card:hover {
+  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+  transform: translateY(-2px);
+}
+
+.card-title {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.card-value {
+  font-size: 32px;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.card-value.success {
+  color: #16a34a;
+}
+
+.card-value.warning {
+  color: #f59e0b;
+}
+
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    width: 260px;
+    height: 100%;
+    background: #fff;
+    transition: left 0.3s ease;
+    z-index: 9999;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+  .sidebar {
+    z-index: 999;
+  }
+}
