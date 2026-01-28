@@ -1,14 +1,9 @@
+// latihan.js
 import { auth, db } from "../assets/js/firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import {
-  collection,
-  getDocs,
-  getDoc,
-  query,
-  where,
-  setDoc,
-  doc,
-  serverTimestamp
+  collection, getDocs, getDoc, query, where,
+  setDoc, doc, serverTimestamp, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 // ================= ELEMENT =================
@@ -26,8 +21,6 @@ let jawaban = {};
 let currentUser = null;
 let userProfile = null;
 let kelasUser = [];
-
-// 🔥 penting untuk flow baru
 let currentLatihanId = null;
 let currentLatihanData = null;
 
@@ -52,14 +45,24 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  kelasUser = Array.isArray(userProfile.kelas)
-    ? userProfile.kelas
-    : [userProfile.kelas];
+  kelasUser = Array.isArray(userProfile.kelas) ? userProfile.kelas : [userProfile.kelas];
 
+  // Load awal
   await loadLatihanAktif();
+
+  // Pasang listener otomatis update
+  listenLatihanAktif();
 });
 
-// ================= LOAD LATIHAN AKTIF =================
+// ================= LISTENER OTOMATIS =================
+function listenLatihanAktif() {
+  const q = query(collection(db, "latihan"), where("aktif", "==", true));
+  onSnapshot(q, async () => {
+    await loadLatihanAktif(); // otomatis reload saat ada latihan baru atau update
+  });
+}
+
+// ================= LOAD LATIHAN =================
 async function loadLatihanAktif() {
   const snap = await getDocs(
     query(collection(db, "latihan"), where("aktif", "==", true))
@@ -68,11 +71,11 @@ async function loadLatihanAktif() {
   latihanListEl.innerHTML = "";
 
   if (snap.empty) {
-    latihanListEl.innerHTML =
-      `<div class="alert alert-warning">Belum ada latihan aktif 😅</div>`;
+    latihanListEl.innerHTML = `<div class="alert alert-warning">Belum ada latihan aktif 😅</div>`;
     return;
   }
 
+  const latihanData = [];
   for (const docSnap of snap.docs) {
     const l = docSnap.data();
     const latihanId = docSnap.id;
@@ -80,42 +83,75 @@ async function loadLatihanAktif() {
     const kelasLatihan = Array.isArray(l.kelas) ? l.kelas : [l.kelas];
     if (!kelasLatihan.some(k => kelasUser.includes(k))) continue;
 
-    // cek sudah submit
     let sudahSubmit = false;
     try {
       const jawabanSnap = await getDoc(
         doc(db, "jawaban_latihan", `${currentUser.uid}_${latihanId}`)
       );
       sudahSubmit = jawabanSnap.exists();
-    } catch (e) {
-      sudahSubmit = false;
-    }
+    } catch {}
 
-    const card = document.createElement("div");
-    card.className = "card p-3 mb-2";
-    card.style.cursor = "pointer";
+    latihanData.push({ id: latihanId, data: l, sudahSubmit });
+  }
 
-    card.innerHTML = `
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <b>${l.judul}</b><br>
-          <small>${l.mapel}</small>
-        </div>
-        ${sudahSubmit ? `<button class="btn btn-outline-primary btn-sm">🔍 Pembahasan</button>` : ``}
-      </div>
-    `;
+  // =================== GROUP PER KELAS → MAPEL ===================
+  let grouped = {};
+  latihanData.forEach(item => {
+    const l = item.data;
+    const kelasList = Array.isArray(l.kelas) ? l.kelas : [l.kelas];
+    kelasList.forEach(kelas => {
+      if (!kelasUser.includes(kelas)) return;
+      if (!grouped[kelas]) grouped[kelas] = {};
+      const mapel = l.mapel || "Umum";
+      if (!grouped[kelas][mapel]) grouped[kelas][mapel] = [];
+      grouped[kelas][mapel].push(item);
+    });
+  });
 
-    card.onclick = () => mulaiLatihan(latihanId, l);
+  // =================== RENDER ===================
+  for (const kelas of Object.keys(grouped)) {
+    const kelasCard = document.createElement("div");
+    kelasCard.className = "kelas-card";
 
-    if (sudahSubmit) {
-      const btn = card.querySelector("button");
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        bukaReview(latihanId, l);
+    const kelasTitle = document.createElement("div");
+    kelasTitle.className = "kelas-title";
+    kelasTitle.innerText = kelas;
+    kelasCard.appendChild(kelasTitle);
+
+    for (const mapel of Object.keys(grouped[kelas])) {
+      const mapelDiv = document.createElement("div");
+      mapelDiv.className = "mapel-item";
+      mapelDiv.innerText = mapel;
+      kelasCard.appendChild(mapelDiv);
+
+      const latihanContainer = document.createElement("div");
+      latihanContainer.style.display = "none";
+      kelasCard.appendChild(latihanContainer);
+
+      mapelDiv.onclick = () => {
+        latihanContainer.style.display =
+          latihanContainer.style.display === "none" ? "block" : "none";
       };
+
+      grouped[kelas][mapel].forEach(item => {
+        const l = item.data;
+        const latihanDiv = document.createElement("div");
+        latihanDiv.className = "latihan-item";
+        latihanDiv.innerHTML = `<span>${l.judul}</span>` +
+          (item.sudahSubmit ? `<button class="btn btn-outline-primary btn-sm">🔍 Pembahasan</button>` : "");
+
+        latihanDiv.onclick = () => mulaiLatihan(item.id, l);
+
+        if (item.sudahSubmit) {
+          const btn = latihanDiv.querySelector("button");
+          btn.onclick = e => { e.stopPropagation(); bukaReview(item.id, l); };
+        }
+
+        latihanContainer.appendChild(latihanDiv);
+      });
     }
 
-    latihanListEl.appendChild(card);
+    latihanListEl.appendChild(kelasCard);
   }
 }
 
@@ -133,11 +169,7 @@ function mulaiLatihan(latihanId, latihanData) {
   jawaban = {};
 
   latihanData.soal.forEach((s, i) => {
-    soalList.push({
-      ...s,
-      id: s.id || `${latihanId}_${i}`,
-      latId: latihanId
-    });
+    soalList.push({ ...s, id: s.id || `${latihanId}_${i}`, latId: latihanId });
   });
 
   judulEl.innerText = latihanData.judul;
@@ -151,14 +183,16 @@ function renderSoal() {
   const s = soalList[index];
 
   soalBox.innerHTML = `
-    ${s.bacaan ? `<p>${s.bacaan}</p>` : ""}
-    <h6>${index + 1}. ${s.tanya}</h6>
-    <div class="opsi-container">
-      ${s.opsi.map((o, i) => `
-        <div class="option" data-index="${i}">
-          ${o}
-        </div>
-      `).join("")}
+    <div class="soal-card">
+      ${s.bacaan ? `<div class="soal-bacaan">${s.bacaan}</div>` : ""}
+      <h6>${index + 1}. ${s.tanya}</h6>
+      <div class="opsi-container">
+        ${s.opsi.map((o, i) => `
+          <div class="option ${jawaban[s.id] === i ? "active" : ""}" data-index="${i}">
+            ${o}
+          </div>
+        `).join("")}
+      </div>
     </div>
   `;
 
@@ -170,8 +204,9 @@ function renderSoal() {
     };
   });
 
-  nextBtn.innerText =
-    index === soalList.length - 1 ? "Submit Jawaban" : "Soal Selanjutnya";
+  nextBtn.innerText = index === soalList.length - 1 ? "Submit Jawaban" : "Soal Selanjutnya";
+
+  if (window.MathJax) MathJax.typesetPromise();
 }
 
 // ================= NEXT / SUBMIT =================
@@ -195,7 +230,6 @@ nextBtn.onclick = async () => {
 // ================= SUBMIT JAWABAN =================
 async function submitJawaban() {
   let benar = 0;
-
   soalList.forEach(s => {
     const kunci = Array.isArray(s.kunci) ? s.kunci[0] : s.kunci;
     if (jawaban[s.id] === kunci) benar++;
@@ -203,32 +237,23 @@ async function submitJawaban() {
 
   const nilai = Math.round((benar / soalList.length) * 100);
 
-  await setDoc(
-    doc(db, "jawaban_latihan", `${currentUser.uid}_${currentLatihanId}`),
-    {
-      userId: currentUser.uid,
-      namaSiswa: userProfile.nama,
-      kelas: userProfile.kelasNama || userProfile.kelas,
-      latihanId: currentLatihanId,
-      judulLatihan: currentLatihanData.judul,
-      mapel: currentLatihanData.mapel,
-      nilai,
-      jawaban,
-      createdAt: serverTimestamp()
-    }
-  );
+  await setDoc(doc(db, "jawaban_latihan", `${currentUser.uid}_${currentLatihanId}`), {
+    userId: currentUser.uid,
+    namaSiswa: userProfile.nama,
+    kelas: userProfile.kelasNama || userProfile.kelas,
+    latihanId: currentLatihanId,
+    judulLatihan: currentLatihanData.judul,
+    mapel: currentLatihanData.mapel,
+    nilai,
+    jawaban,
+    createdAt: serverTimestamp()
+  });
 }
 
 // ================= BUKA REVIEW =================
 async function bukaReview(latihanId, latihanData) {
-  const snap = await getDoc(
-    doc(db, "jawaban_latihan", `${currentUser.uid}_${latihanId}`)
-  );
-
-  if (!snap.exists()) {
-    alert("Data review tidak ditemukan");
-    return;
-  }
+  const snap = await getDoc(doc(db, "jawaban_latihan", `${currentUser.uid}_${latihanId}`));
+  if (!snap.exists()) { alert("Data review tidak ditemukan"); return; }
 
   const dataJawaban = snap.data();
 
@@ -239,58 +264,34 @@ async function bukaReview(latihanId, latihanData) {
   judulEl.innerText = latihanData.judul;
   mapelEl.innerText = latihanData.mapel;
 
-  let html = `
-    <div class="alert alert-success">
-      🎉 Nilai kamu: <b>${dataJawaban.nilai}</b>
-    </div>
-
-    <button id="backToList" class="btn btn-secondary mb-3">
-      ⬅ Kembali ke Daftar Latihan
-    </button>
-  `;
+  let html = `<div class="alert alert-success">🎉 Nilai kamu: <b>${dataJawaban.nilai}</b></div>
+              <button id="backToList" class="btn btn-secondary mb-3">⬅ Kembali ke Daftar Latihan</button>`;
 
   latihanData.soal.forEach((s, i) => {
     const soalId = s.id || `${latihanId}_${i}`;
     const jawabanSiswa = dataJawaban.jawaban[soalId];
     const kunci = Array.isArray(s.kunci) ? s.kunci[0] : s.kunci;
 
-    html += `
-      <div class="card p-3 mb-4">
-        <h6>${i + 1}. ${s.tanya}</h6>
-        ${s.bacaan ? `<p>${s.bacaan}</p>` : ""}
-
-        ${s.opsi.map((opsi, idx) => {
-          let cls = "option";
-          let label = "";
-
-          if (idx === kunci) {
-            cls += " border-success bg-success-subtle";
-            label = " ✅ Jawaban Benar";
-          } else if (idx === jawabanSiswa) {
-            cls += " border-danger bg-danger-subtle";
-            label = " ❌ Jawaban Kamu";
-          }
-
-          return `
-            <div class="${cls}" style="cursor:default">
-              ${opsi}
-              <small class="ms-2">${label}</small>
-            </div>
-          `;
-        }).join("")}
-
-        <div class="alert alert-info mt-3">
-          ${s.bahas || "<i>Pembahasan belum tersedia.</i>"}
-        </div>
-      </div>
-    `;
+    html += `<div class="soal-card">
+              ${s.bacaan ? `<div class="soal-bacaan">${s.bacaan}</div>` : ""}
+              <h6>${i + 1}. ${s.tanya}</h6>
+              ${s.opsi.map((opsi, idx) => {
+                let cls = "option";
+                if(idx === kunci) cls += " correct";
+                else if(idx === jawabanSiswa) cls += " wrong";
+                return `<div class="${cls}" style="cursor:default">${opsi}</div>`;
+              }).join("")}
+              <div class="alert alert-info mt-3">${s.bahas || "<i>Pembahasan belum tersedia.</i>"}</div>
+            </div>`;
   });
 
   soalBox.innerHTML = html;
 
+  if(window.MathJax) MathJax.typesetPromise();
+
   document.getElementById("backToList").onclick = async () => {
     soalContainer.style.display = "none";
     latihanListEl.style.display = "block";
-    await loadLatihanAktif();
+    await loadLatihanAktif(); // reload otomatis
   };
 }
