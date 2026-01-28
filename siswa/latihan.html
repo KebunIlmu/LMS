@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Latihan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body { background:#f5f7fb; }
+.card { border-radius:18px; border:none; box-shadow:0 8px 20px rgba(0,0,0,.06); cursor:pointer; }
+.card:hover { box-shadow:0 10px 25px rgba(0,0,0,.1); }
+.option {
+  border:2px solid #e5e7eb;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition: all 0.2s;
+  background:#fff;
+}
+.option:hover {
+  border-color:#2563eb;
+  background:#eff6ff;
+}
+.option.active {
+  border-color:#2563eb;
+  background:#dbeafe;
+}
+
+</style>
+</head>
+<body>
+<div class="container py-4">
+  <h4 class="mb-3">Pilih Latihan Aktif</h4>
+  <div id="latihanList"></div>
+
+  <div id="soalContainer" style="display:none;">
+    <div class="card p-3 mb-3">
+      <h5 id="judulLatihan">Latihan</h5>
+      <small class="text-muted" id="mapelLatihan"></small>
+    </div>
+    <div class="card p-4">
+      <div id="soalBox"></div>
+      <button id="nextBtn" class="btn btn-primary w-100 mt-3">Soal Selanjutnya</button>
+    </div>
+  </div>
+   <a href="dashboard.html" class="btn btn-outline-secondary btn-sm">
+    ← Kembali ke Dashboard
+  </a>
+</div>
+<script type="module" src="latihan.js"></script>
+</body>
+</html>
