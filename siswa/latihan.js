@@ -63,6 +63,7 @@ function listenLatihanAktif() {
 }
 
 // ================= LOAD LATIHAN =================
+// ================= LOAD LATIHAN =================
 async function loadLatihanAktif() {
   const snap = await getDocs(
     query(collection(db, "latihan"), where("aktif", "==", true))
@@ -94,6 +95,15 @@ async function loadLatihanAktif() {
     latihanData.push({ id: latihanId, data: l, sudahSubmit });
   }
 
+  // =================== SORT LATIHAN BERDASARKAN JUDUL ===================
+  latihanData.sort((a, b) => {
+    const judulA = a.data.judul.toUpperCase();
+    const judulB = b.data.judul.toUpperCase();
+    if (judulA < judulB) return -1;
+    if (judulA > judulB) return 1;
+    return 0;
+  });
+
   // =================== GROUP PER KELAS → MAPEL ===================
   let grouped = {};
   latihanData.forEach(item => {
@@ -109,7 +119,7 @@ async function loadLatihanAktif() {
   });
 
   // =================== RENDER ===================
-  for (const kelas of Object.keys(grouped)) {
+  for (const kelas of Object.keys(grouped).sort()) { // kelas urut abjad
     const kelasCard = document.createElement("div");
     kelasCard.className = "kelas-card";
 
@@ -118,7 +128,7 @@ async function loadLatihanAktif() {
     kelasTitle.innerText = kelas;
     kelasCard.appendChild(kelasTitle);
 
-    for (const mapel of Object.keys(grouped[kelas])) {
+    for (const mapel of Object.keys(grouped[kelas]).sort()) { // mapel urut abjad
       const mapelDiv = document.createElement("div");
       mapelDiv.className = "mapel-item";
       mapelDiv.innerText = mapel;
@@ -154,6 +164,7 @@ async function loadLatihanAktif() {
     latihanListEl.appendChild(kelasCard);
   }
 }
+
 
 // ================= MULAI LATIHAN =================
 function mulaiLatihan(latihanId, latihanData) {
