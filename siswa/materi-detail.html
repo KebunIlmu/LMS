@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Detail Materi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  body { background: #f0f2f5; font-family: 'Inter', sans-serif; }
+  .materi-box { margin-top: 20px; }
+  iframe { border-radius: 8px; }
+</style>
+</head>
+<body class="p-4">
+
+<div class="container">
+  <a href="materi-siswa.html" class="btn btn-secondary mb-3">← Kembali</a>
+  <div id="materiContent" class="materi-box"></div>
+</div>
+
+<script type="module">
+import { db } from "../assets/js/firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+// ================= Helper =================
+function extractYouTubeID(url){
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+}
+
+// ================= Ambil ID dari URL =================
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+const materiContent = document.getElementById("materiContent");
+
+if(!id){
+  materiContent.innerHTML = "<div class='alert alert-danger'>Materi tidak ditemukan</div>";
+} else {
+  // ================= Ambil data materi =================
+  const docRef = doc(db, "materi", id);
+  const snap = await getDoc(docRef);
+
+  if(!snap.exists()){
+    materiContent.innerHTML = "<div class='alert alert-danger'>Materi tidak ditemukan</div>";
+  } else {
+    const m = snap.data();
+
+    materiContent.innerHTML = `
+      <h3>${m.judul}</h3>
+      <div>${m.konten || "<p>Materi kosong</p>"}</div>
+
+      ${m.youtube ? `
+        <div class="mt-4">
+          <h5>📺 Video</h5>
+          <iframe width="100%" height="360" 
+            src="https://www.youtube.com/embed/${extractYouTubeID(m.youtube)}" 
+            frameborder="0" allowfullscreen>
+          </iframe>
+        </div>
+      ` : ''}
+
+      ${m.pdf ? `
+        <div class="mt-4">
+          <h5>📄 PDF</h5>
+          <a href="${m.pdf}" target="_blank" class="btn btn-primary">Buka PDF</a>
+        </div>
+      ` : ''}
+    `;
+  }
+}
+</script>
+
+</body>
+</html>
