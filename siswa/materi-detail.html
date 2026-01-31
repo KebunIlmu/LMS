@@ -10,6 +10,20 @@
   .materi-box { margin-top: 20px; }
   iframe { border-radius: 8px; }
 </style>
+<!-- MathJax -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [["\\(","\\)"]],
+    displayMath: [["\\[","\\]"]]
+  },
+  options: {
+    skipHtmlTags: ["script","style","textarea","pre"]
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
 </head>
 <body class="p-4">
 
@@ -68,6 +82,11 @@ if(!id){
         </div>
       ` : ''}
     `;
+    // 🔥 INI YANG BIKIN RUMUS MUNCUL
+if (window.MathJax) {
+  MathJax.typesetClear();
+  MathJax.typesetPromise([materiContent]);
+}
   }
 }
 </script>
