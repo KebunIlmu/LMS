@@ -24,6 +24,20 @@ body { background: #f0f2f5; font-family: 'Inter', sans-serif; }
 .materi-item:hover { background: #fde68a; }
 #previewWrapper { margin-top: 20px; height: 400px; border:1px solid #ddd; border-radius:8px; overflow:auto; }
 </style>
+<!-- MathJax -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [["\\(","\\)"]],
+    displayMath: [["\\[","\\]"]]
+  },
+  options: {
+    skipHtmlTags: ["script","style","textarea","pre"]
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
 </head>
 
 <body class="p-4">
