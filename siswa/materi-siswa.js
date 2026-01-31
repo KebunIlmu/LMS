@@ -132,7 +132,28 @@ function renderMateri(){
 // ================= PREVIEW =================
 function previewMateri(m){
   const docFrame = previewIframe.contentDocument || previewIframe.contentWindow.document;
+
   docFrame.open();
-  docFrame.write(m.konten || "<p>Materi kosong</p>");
+  docFrame.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+
+      <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [["\\\\(","\\\\)"]],
+          displayMath: [["\\\\[","\\\\]"]]
+        }
+      };
+      </script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    </head>
+    <body>
+      ${m.konten || "<p>Materi kosong</p>"}
+    </body>
+    </html>
+  `);
   docFrame.close();
 }
