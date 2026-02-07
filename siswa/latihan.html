@@ -120,17 +120,38 @@ button#nextBtn {
   padding: 12px;
   font-size: 1rem;
 }
+.bab-item {
+  margin-left: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  transition: 0.2s;
+}
+.bab-item:hover { background: #e5e7eb; }
 
 </style>
 
   <!-- MathJax -->
   <script>
-    window.MathJax = {
-      tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
-      options: { skipHtmlTags: ["script", "style", "textarea", "pre"] },
-    };
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["\\(", "\\)"],
+        ["$", "$"]
+      ],
+      displayMath: [
+        ["\\[", "\\]"],
+        ["$$", "$$"]
+      ]
+    },
+    options: {
+      skipHtmlTags: ["script", "style", "textarea", "pre"]
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 
 <body>
