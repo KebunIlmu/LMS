@@ -104,7 +104,7 @@ async function loadLatihanAktif() {
     return 0;
   });
 
-  // =================== GROUP PER KELAS → MAPEL ===================
+  // =================== GROUP PER KELAS → MAPEL → BAB ===================
   let grouped = {};
   latihanData.forEach(item => {
     const l = item.data;
@@ -112,14 +112,20 @@ async function loadLatihanAktif() {
     kelasList.forEach(kelas => {
       if (!kelasUser.includes(kelas)) return;
       if (!grouped[kelas]) grouped[kelas] = {};
+      
       const mapel = l.mapel || "Umum";
-      if (!grouped[kelas][mapel]) grouped[kelas][mapel] = [];
-      grouped[kelas][mapel].push(item);
+      if (!grouped[kelas][mapel]) grouped[kelas][mapel] = {};
+
+      const bab = l.bab || "Umum";
+      if (!grouped[kelas][mapel][bab]) grouped[kelas][mapel][bab] = [];
+
+      grouped[kelas][mapel][bab].push(item);
     });
   });
 
-  // =================== RENDER ===================
-  for (const kelas of Object.keys(grouped).sort()) { // kelas urut abjad
+
+    // =================== RENDER ===================
+  for (const kelas of Object.keys(grouped).sort()) {
     const kelasCard = document.createElement("div");
     kelasCard.className = "kelas-card";
 
@@ -128,41 +134,57 @@ async function loadLatihanAktif() {
     kelasTitle.innerText = kelas;
     kelasCard.appendChild(kelasTitle);
 
-    for (const mapel of Object.keys(grouped[kelas]).sort()) { // mapel urut abjad
+    for (const mapel of Object.keys(grouped[kelas]).sort()) {
       const mapelDiv = document.createElement("div");
       mapelDiv.className = "mapel-item";
       mapelDiv.innerText = mapel;
       kelasCard.appendChild(mapelDiv);
 
-      const latihanContainer = document.createElement("div");
-      latihanContainer.style.display = "none";
-      kelasCard.appendChild(latihanContainer);
+      const babContainer = document.createElement("div");
+      babContainer.style.display = "none";
+      kelasCard.appendChild(babContainer);
 
       mapelDiv.onclick = () => {
-        latihanContainer.style.display =
-          latihanContainer.style.display === "none" ? "block" : "none";
+        babContainer.style.display = babContainer.style.display === "none" ? "block" : "none";
       };
 
-      grouped[kelas][mapel].forEach(item => {
-        const l = item.data;
-        const latihanDiv = document.createElement("div");
-        latihanDiv.className = "latihan-item";
-        latihanDiv.innerHTML = `<span>${l.judul}</span>` +
-          (item.sudahSubmit ? `<button class="btn btn-outline-primary btn-sm">🔍 Pembahasan</button>` : "");
+      for (const bab of Object.keys(grouped[kelas][mapel]).sort()) {
+        const babDiv = document.createElement("div");
+        babDiv.className = "mapel-item"; // bisa bikin class baru 'bab-item'
+        babDiv.innerText = "📖 " + bab;
+        babDiv.style.marginLeft = "10px";
+        babContainer.appendChild(babDiv);
 
-        latihanDiv.onclick = () => mulaiLatihan(item.id, l);
+        const latihanContainer = document.createElement("div");
+        latihanContainer.style.display = "none";
+        babContainer.appendChild(latihanContainer);
 
-        if (item.sudahSubmit) {
-          const btn = latihanDiv.querySelector("button");
-          btn.onclick = e => { e.stopPropagation(); bukaReview(item.id, l); };
-        }
+        babDiv.onclick = () => {
+          latihanContainer.style.display = latihanContainer.style.display === "none" ? "block" : "none";
+        };
 
-        latihanContainer.appendChild(latihanDiv);
-      });
+        grouped[kelas][mapel][bab].forEach(item => {
+          const l = item.data;
+          const latihanDiv = document.createElement("div");
+          latihanDiv.className = "latihan-item";
+          latihanDiv.innerHTML = `<span>${l.judul}</span>` +
+            (item.sudahSubmit ? `<button class="btn btn-outline-primary btn-sm">🔍 Pembahasan</button>` : "");
+
+          latihanDiv.onclick = () => mulaiLatihan(item.id, l);
+
+          if (item.sudahSubmit) {
+            const btn = latihanDiv.querySelector("button");
+            btn.onclick = e => { e.stopPropagation(); bukaReview(item.id, l); };
+          }
+
+          latihanContainer.appendChild(latihanDiv);
+        });
+      }
     }
 
     latihanListEl.appendChild(kelasCard);
-  }
+}
+
 }
 
 
@@ -217,7 +239,11 @@ function renderSoal() {
 
   nextBtn.innerText = index === soalList.length - 1 ? "Submit Jawaban" : "Soal Selanjutnya";
 
-  if (window.MathJax) MathJax.typesetPromise();
+  if (window.MathJax) {
+  MathJax.typesetClear();
+  MathJax.typesetPromise([soalBox]);
+}
+
 }
 
 // ================= NEXT / SUBMIT =================
@@ -298,7 +324,10 @@ async function bukaReview(latihanId, latihanData) {
 
   soalBox.innerHTML = html;
 
-  if(window.MathJax) MathJax.typesetPromise();
+  if (window.MathJax) {
+  MathJax.typesetClear();
+  MathJax.typesetPromise([soalBox]);
+}
 
   document.getElementById("backToList").onclick = async () => {
     soalContainer.style.display = "none";
