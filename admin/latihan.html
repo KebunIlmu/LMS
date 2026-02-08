@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Latihan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+
+<style>
+.badge-aktif { background:#22c55e }
+.badge-nonaktif { background:#ef4444 }
+.action-btn { font-size:.8rem }
+#previewLatihan { background:#f8fafc; min-height: 350px; overflow:auto; }
+</style>
+<script>
+window.MathJax = {
+  tex: { inlineMath:[["\\(","\\)"]], displayMath:[["\\[","\\]"]] },
+  options: { skipHtmlTags:["script","style","textarea","pre"] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+</head>
+
+<body>
+
+<button id="toggleSidebar" class="btn btn-outline-primary d-md-none m-2">☰</button>
+<div id="overlay"></div>
+
+<div class="admin-wrapper">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <span class="logo">LMS Admin</span>
+    </div>
+
+    <ul class="menu">
+      <li><a href="dashboard.html">🏠 Dashboard</a></li>
+      <li><a href="users.html">👥 Akun</a></li>
+      <li><a href="classes.html">🏫 Kelas</a></li>
+      <li><a href="materi.html">📚 Materi</a></li>
+      <li><a href="latihan.html" class="active">📝 Latihan</a></li>
+      <li><a href="laporan.html">📊 Laporan</a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <a href="../index.html">🚪 Logout</a>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4>📋 Daftar Latihan</h4>
+      <a href="latihan-buat.html" class="btn btn-primary btn-sm">+ Buat Latihan</a>
+    </div>
+
+    <div class="row g-2 mb-3">
+  <div class="col-md-2">
+    <select id="sortJudul" class="form-select form-select-sm">
+      <option value="">Judul</option>
+      <option value="asc">A → Z</option>
+      <option value="desc">Z → A</option>
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <select id="filterStatus" class="form-select form-select-sm">
+      <option value="">Status</option>
+      <option value="aktif">Aktif</option>
+      <option value="nonaktif">Nonaktif</option>
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <select id="filterBab" class="form-select form-select-sm">
+      <option value="">BAB</option>
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <select id="filterMapel" class="form-select form-select-sm">
+      <option value="">Mapel</option>
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <select id="filterKelas" class="form-select form-select-sm">
+      <option value="">Kelas</option>
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <select id="sortSoal" class="form-select form-select-sm">
+      <option value="">Jumlah Soal</option>
+      <option value="asc">Sedikit → Banyak</option>
+      <option value="desc">Banyak → Sedikit</option>
+    </select>
+  </div>
+
+  <div class="col-md-4">
+    <input id="searchLatihan" class="form-control form-control-sm"
+      placeholder="Cari judul / mapel / BAB...">
+  </div>
+</div>
+
+    <div class="card p-3">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Judul</th>
+              <th>Mapel</th>
+              <th>BAB</th>
+              <th>Kelas</th>
+              <th>Status</th>
+              <th>Jumlah Soal</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="latihanTable">
+            <tr>
+              <td colspan="6" class="text-muted text-center">Memuat data...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= MODAL EDIT ================= -->
+<div class="modal fade" id="editLatihanModal" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">✏️ Edit Latihan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="latihanId">
+
+        <div class="row g-3">
+          <div class="col-md-6">
+
+            <div class="mb-2">
+              <label>Judul</label>
+              <input id="editLatihanJudul" class="form-control">
+            </div>
+
+            <div class="mb-2">
+              <label>Mata Pelajaran</label>
+              <input id="editLatihanMapel" class="form-control">
+            </div>
+
+            <div class="mb-2">
+              <label>BAB / Topik</label>
+              <input id="editLatihanBab" class="form-control" placeholder="Contoh: Trigonometri">
+            </div>
+
+            <div class="mb-2">
+              <label>Kelas</label>
+              <select id="editLatihanKelas" class="form-select" multiple></select>
+            </div>
+
+            <div class="mb-2 form-check">
+              <input type="checkbox" id="editLatihanPublish" class="form-check-input">
+              <label class="form-check-label">Aktifkan latihan</label>
+            </div>
+
+            <hr>
+            <h6>Soal Latihan</h6>
+            <div id="latihanSoalList"></div>
+            <button type="button" class="btn btn-sm btn-success my-2" id="addLatihanSoalBtn">+ Tambah Soal</button>
+
+          </div>
+
+          <div class="col-md-6">
+            <label>👁 Preview Soal</label>
+            <div id="previewLatihan" class="border rounded p-3"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-primary" id="btnSimpanLatihan">Simpan Semua</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/sidebar.js"></script>
+<script type="module" src="js/auth-admin.js"></script>
+<script type="module" src="js/latihan-list.js"></script>
+</body>
+</html>
