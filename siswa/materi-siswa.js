@@ -67,67 +67,104 @@ async function loadMateri(){
 function renderMateri(){
   materiListEl.innerHTML = "";
 
-  if(materiData.length===0){
-    materiListEl.innerHTML="<div class='alert alert-warning'>Belum ada materi 😅</div>";
+  if(materiData.length === 0){
+    materiListEl.innerHTML =
+      "<div class='alert alert-warning'>Belum ada materi 😅</div>";
     return;
   }
 
-  // Group per kelas → mapel
   let grouped = {};
-  materiData.forEach(m=>{
+
+  materiData.forEach(m => {
     const kelasList = Array.isArray(m.kelas) ? m.kelas : [m.kelas];
-    kelasList.forEach(k=>{
-      // hanya ambil kelas user yang match
-      const matchKelas = kelasUser.find(userKelas => 
-        k.toLowerCase().includes(userKelas.toLowerCase()) || 
+
+    kelasList.forEach(k => {
+      const matchKelas = kelasUser.find(userKelas =>
+        k.toLowerCase().includes(userKelas.toLowerCase()) ||
         userKelas.toLowerCase().includes(k.toLowerCase())
       );
       if(!matchKelas) return;
 
-      if(!grouped[matchKelas]) grouped[matchKelas]={};
       const mapel = m.mapel || "Umum";
-      if(!grouped[matchKelas][mapel]) grouped[matchKelas][mapel]=[];
-      grouped[matchKelas][mapel].push(m);
+      const bab = m.bab || "Bab Lainnya";
+      const tipe = m.tipe || "materi";
+
+      grouped[matchKelas] ??= {};
+      grouped[matchKelas][mapel] ??= {};
+      grouped[matchKelas][mapel][bab] ??= { materi: [], latihan: [] };
+
+      grouped[matchKelas][mapel][bab][tipe].push(m);
     });
   });
 
+  // ================= RENDER =================
   for(const kelas of Object.keys(grouped).sort()){
-    const kelasCard = document.createElement("div"); 
-    kelasCard.className="kelas-card";
+    const kelasCard = document.createElement("div");
+    kelasCard.className = "kelas-card";
 
-    const kelasTitle = document.createElement("div"); 
-    kelasTitle.className="kelas-title"; 
-    kelasTitle.innerText=kelas;
-    kelasCard.appendChild(kelasTitle);
+    kelasCard.innerHTML = `<div class="kelas-title">${kelas}</div>`;
 
     for(const mapel of Object.keys(grouped[kelas]).sort()){
-      const mapelDiv = document.createElement("div"); 
-      mapelDiv.className="mapel-item"; 
-      mapelDiv.innerText=mapel;
-      kelasCard.appendChild(mapelDiv);
+      const mapelDiv = document.createElement("div");
+      mapelDiv.className = "mapel-item";
+      mapelDiv.innerText = mapel;
 
-      const materiContainer = document.createElement("div"); 
-      materiContainer.style.display="none";
-      kelasCard.appendChild(materiContainer);
+      const mapelContainer = document.createElement("div");
+      mapelContainer.style.display = "none";
 
-      mapelDiv.onclick = ()=>{ 
-        materiContainer.style.display = materiContainer.style.display==="none"?"block":"none"; 
+      mapelDiv.onclick = () => {
+        mapelContainer.style.display =
+          mapelContainer.style.display === "none" ? "block" : "none";
+      };
+
+      for(const bab of Object.keys(grouped[kelas][mapel]).sort()){
+        const babDiv = document.createElement("div");
+        babDiv.className = "materi-item";
+        babDiv.innerHTML = `<b>📘 ${bab}</b>`;
+
+        const babContainer = document.createElement("div");
+        babContainer.style.marginLeft = "20px";
+        babContainer.style.display = "none";
+
+        babDiv.onclick = () => {
+          babContainer.style.display =
+            babContainer.style.display === "none" ? "block" : "none";
+        };
+
+        // ===== Materi =====
+        grouped[kelas][mapel][bab].materi.forEach(m => {
+          const item = document.createElement("div");
+          item.className = "materi-item";
+          item.innerText = "📄 " + m.judul;
+          item.onclick = () => {
+            window.location.href = `materi-detail.html?id=${m.id}`;
+          };
+          babContainer.appendChild(item);
+        });
+
+        // ===== Latihan =====
+        grouped[kelas][mapel][bab].latihan.forEach(m => {
+          const item = document.createElement("div");
+          item.className = "materi-item";
+          item.innerText = "✏️ Latihan: " + m.judul;
+          item.onclick = () => {
+            window.location.href = `latihan-detail.html?id=${m.id}`;
+          };
+          babContainer.appendChild(item);
+        });
+
+        mapelContainer.appendChild(babDiv);
+        mapelContainer.appendChild(babContainer);
       }
 
-      grouped[kelas][mapel].forEach(m=>{
-        const matDiv = document.createElement("div"); 
-        matDiv.className="materi-item"; 
-        matDiv.innerText=m.judul;
-         matDiv.onclick = ()=> {
-    window.location.href = `materi-detail.html?id=${m.id}`;
-  }
-        materiContainer.appendChild(matDiv);
-      });
+      kelasCard.appendChild(mapelDiv);
+      kelasCard.appendChild(mapelContainer);
     }
 
     materiListEl.appendChild(kelasCard);
   }
 }
+
 
 // ================= PREVIEW =================
 function previewMateri(m){
