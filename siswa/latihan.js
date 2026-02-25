@@ -77,21 +77,22 @@ async function loadLatihanAktif() {
   }
 
   const latihanData = [];
+  // ================= AMBIL SEMUA JAWABAN USER SEKALI SAJA =================
+const jawabanSnapAll = await getDocs(
+  query(collection(db, "jawaban_latihan"), where("userId", "==", currentUser.uid))
+);
+
+let jawabanMap = {};
+jawabanSnapAll.forEach(d => {
+  jawabanMap[d.data().latihanId] = true;
+});
   for (const docSnap of snap.docs) {
     const l = docSnap.data();
     const latihanId = docSnap.id;
 
     const kelasLatihan = Array.isArray(l.kelas) ? l.kelas : [l.kelas];
     if (!kelasLatihan.some(k => kelasUser.includes(k))) continue;
-
-    let sudahSubmit = false;
-    try {
-      const jawabanSnap = await getDoc(
-        doc(db, "jawaban_latihan", `${currentUser.uid}_${latihanId}`)
-      );
-      sudahSubmit = jawabanSnap.exists();
-    } catch {}
-
+    let sudahSubmit = !!jawabanMap[latihanId];
     latihanData.push({ id: latihanId, data: l, sudahSubmit });
   }
 
