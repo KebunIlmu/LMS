@@ -51,7 +51,7 @@ let currentUser = null;
 let currentTryoutId = null;
 let currentTryoutData = null;
 
-
+let namaUser = ""; 
 /* ================= LOGIN ================= */
 
 onAuthStateChanged(auth, async(user)=>{
@@ -62,6 +62,15 @@ return;
 }
 
 currentUser=user;
+
+/* ambil data user dari Firestore */
+
+const userRef = doc(db,"users",user.uid);
+const userSnap = await getDoc(userRef);
+
+if(userSnap.exists()){
+namaUser = userSnap.data().nama || "";
+}
 
 loadTryout();
 
@@ -211,15 +220,23 @@ soalList.forEach((s,i)=>{
 
 const btn=document.createElement("button");
 
-btn.className="btn btn-outline-secondary";
+/* tampilkan nomor */
+btn.textContent = i + 1;
 
-btn.innerText=i+1;
+/* tombol aktif */
+if(i === index){
+btn.classList.add("active");
+}
+
+/* tombol sudah dijawab */
+if(jawaban[i] !== undefined){
+btn.classList.add("answered");
+}
 
 btn.onclick=()=>{
-
 index=i;
 renderSoal();
-
+renderNav();
 };
 
 navSoal.appendChild(btn);
@@ -227,7 +244,6 @@ navSoal.appendChild(btn);
 });
 
 }
-
 
 /* ================= UPDATE NAV ================= */
 
@@ -359,7 +375,114 @@ ${jawab[i]===false?"checked":""}>
 html+=`</tbody></table>`;
 
 }
+/* ===== PERNYATAAN ===== */
 
+if(s.tipe==="ps"){
+
+const jawab=jawaban[index]||[];
+
+html+=`
+<table class="table table-bordered">
+
+<thead>
+<tr>
+<th>Pernyataan</th>
+<th>Sesuai</th>
+<th>Tidak Sesuai</th>
+</tr>
+</thead>
+
+<tbody>
+`;
+
+s.opsi.forEach((o,i)=>{
+
+html+=`
+
+<tr>
+
+<td>${fixImgur(o)}</td>
+
+<td>
+<input type="radio"
+name="ps_${i}"
+data-index="${i}"
+value="true"
+${jawab[i]===true?"checked":""}>
+</td>
+
+<td>
+<input type="radio"
+name="ps_${i}"
+data-index="${i}"
+value="false"
+${jawab[i]===false?"checked":""}>
+</td>
+
+</tr>
+
+`;
+
+});
+
+html+=`</tbody></table>`;
+
+}
+
+
+/* ===== MENDUKUNG / TIDAK MENDUKUNG ===== */
+
+if(s.tipe==="md"){
+
+const jawab=jawaban[index]||[];
+
+html+=`
+<table class="table table-bordered">
+
+<thead>
+<tr>
+<th>Alasan</th>
+<th>Mendukung</th>
+<th>Tidak Mendukung</th>
+</tr>
+</thead>
+
+<tbody>
+`;
+
+s.opsi.forEach((o,i)=>{
+
+html+=`
+
+<tr>
+
+<td>${fixImgur(o)}</td>
+
+<td>
+<input type="radio"
+name="md_${i}"
+data-index="${i}"
+value="true"
+${jawab[i]===true?"checked":""}>
+</td>
+
+<td>
+<input type="radio"
+name="md_${i}"
+data-index="${i}"
+value="false"
+${jawab[i]===false?"checked":""}>
+</td>
+
+</tr>
+
+`;
+
+});
+
+html+=`</tbody></table>`;
+
+}
 html+=`</div>`;
 
 soalBox.innerHTML=html;
@@ -393,7 +516,9 @@ const val=Number(el.dataset.index);
 
 if(el.checked){
 
+if(!arr.includes(val)){
 arr.push(val);
+}
 
 }else{
 
@@ -486,23 +611,24 @@ soalList.forEach((s,i)=>{
 const j=jawaban[i];
 
 if(s.tipe==="pg"){
-
 if(j===s.kunci[0])benar++;
-
 }
 
 if(s.tipe==="cb"){
-
 if(JSON.stringify(j?.sort())===JSON.stringify(s.kunci?.sort()))benar++;
-
 }
 
 if(s.tipe==="bs"){
-
-if(JSON.stringify(j)===JSON.stringify(s.kunci))benar++;
-
+if(j && JSON.stringify(j)===JSON.stringify(s.kunci))benar++;
 }
 
+if(s.tipe==="ps"){
+if(j && JSON.stringify(j)===JSON.stringify(s.kunci))benar++;
+}
+
+if(s.tipe==="md"){
+if(j && JSON.stringify(j)===JSON.stringify(s.kunci))benar++;
+}
 });
 
 return Math.round((benar/soalList.length)*100);
@@ -532,6 +658,8 @@ jawabanClean[k] = jawaban[k] ?? null;
 await setDoc(doc(db,"hasil_tryout",`${currentUser.uid}_${currentTryoutId}`),{
 
 uid: currentUser.uid || "",
+
+nama: namaUser || "",   // TAMBAHKAN INI
 
 tryoutId: currentTryoutId || "",
 
@@ -575,6 +703,14 @@ if(s.tipe==="bs"){
 benar = JSON.stringify(jawaban[i]) === JSON.stringify(s.kunci);
 }
 
+if(s.tipe==="ps"){
+benar = JSON.stringify(jawaban[i]) === JSON.stringify(s.kunci);
+}
+
+if(s.tipe==="md"){
+benar = JSON.stringify(jawaban[i]) === JSON.stringify(s.kunci);
+}
+
 return `
 
 <div class="soal-card mb-3">
@@ -597,6 +733,9 @@ if(s.tipe==="cb" && s.kunci.includes(j)){
 label=" ✅";
 }
 
+if((s.tipe==="bs" || s.tipe==="ps" || s.tipe==="md") && s.kunci[j]===true){
+label=" ✅";
+}
 return `<div>${fixImgur(o)} ${label}</div>`;
 
 }).join("")}
