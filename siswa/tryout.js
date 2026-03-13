@@ -8,7 +8,8 @@ doc,
 setDoc,
 serverTimestamp,
 query,
-where
+where,
+orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 import {
@@ -81,7 +82,11 @@ loadTryout();
 
 async function loadTryout(){
 
-const q=query(collection(db,"tryout"),where("publish","==",true));
+const q = query(
+  collection(db,"tryout"),
+  where("publish","==",true),
+  orderBy("judul","asc")
+);
 const snap=await getDocs(q);
 
 tryoutList.innerHTML="";
