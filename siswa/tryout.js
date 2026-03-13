@@ -429,7 +429,58 @@ html+=`</tbody></table>`;
 
 }
 
+/* ===== DAMPAK PENDEK / PANJANG ===== */
 
+if(s.tipe==="dp"){
+
+const jawab=jawaban[index]||[];
+
+html+=`
+<table class="table table-bordered">
+
+<thead>
+<tr>
+<th>Pernyataan</th>
+<th>Dampak Jangka Pendek</th>
+<th>Dampak Jangka Panjang</th>
+</tr>
+</thead>
+
+<tbody>
+`;
+
+s.opsi.forEach((o,i)=>{
+
+html+=`
+
+<tr>
+
+<td>${fixImgur(o)}</td>
+
+<td>
+<input type="radio"
+name="dp_${i}"
+data-index="${i}"
+value="true"
+${jawab[i]===true?"checked":""}>
+</td>
+
+<td>
+<input type="radio"
+name="dp_${i}"
+data-index="${i}"
+value="false"
+${jawab[i]===false?"checked":""}>
+</td>
+
+</tr>
+
+`;
+
+});
+
+html+=`</tbody></table>`;
+}
 /* ===== MENDUKUNG / TIDAK MENDUKUNG ===== */
 
 if(s.tipe==="md"){
@@ -626,6 +677,10 @@ if(s.tipe==="ps"){
 if(j && JSON.stringify(j)===JSON.stringify(s.kunci))benar++;
 }
 
+if(s.tipe==="dp"){
+if(j && JSON.stringify(j)===JSON.stringify(s.kunci))benar++;
+}
+
 if(s.tipe==="md"){
 if(j && JSON.stringify(j)===JSON.stringify(s.kunci))benar++;
 }
@@ -711,6 +766,10 @@ if(s.tipe==="md"){
 benar = JSON.stringify(jawaban[i]) === JSON.stringify(s.kunci);
 }
 
+if(s.tipe==="dp"){
+benar = JSON.stringify(jawaban[i]) === JSON.stringify(s.kunci);
+}
+
 return `
 
 <div class="soal-card mb-3">
@@ -733,7 +792,7 @@ if(s.tipe==="cb" && s.kunci.includes(j)){
 label=" ✅";
 }
 
-if((s.tipe==="bs" || s.tipe==="ps" || s.tipe==="md") && s.kunci[j]===true){
+if((s.tipe==="bs" || s.tipe==="ps" || s.tipe==="md" || s.tipe==="dp") && s.kunci[j]===true){
 label=" ✅";
 }
 return `<div>${fixImgur(o)} ${label}</div>`;
