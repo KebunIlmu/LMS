@@ -97,52 +97,53 @@ return;
 
 for(const docSnap of snap.docs){
 
-const t=docSnap.data();
-const id=docSnap.id;
+  const t = docSnap.data();
+  const id = docSnap.id;
 
-/* cek apakah sudah pernah mengerjakan */
+  // cek apakah sudah pernah mengerjakan
+  const hasilRef = doc(db,"hasil_tryout", currentUser.uid, "tryout", id);
+  const hasilSnap = await getDoc(hasilRef);
 
-const hasilRef = doc(db,"hasil_tryout",`${currentUser.uid}_${id}`);
-const hasilSnap = await getDoc(hasilRef);
+  const div = document.createElement("div");
+  div.className = "tryout-card";
 
-const div=document.createElement("div");
-div.className="tryout-card";
+  let tombol = "";
 
-let tombol="";
+  if(hasilSnap.exists()){
+    // jika sudah dikerjakan, tampilkan dua tombol
+    tombol = `
+      <button class="btn btn-primary mt-2 btn-mulai">Mulai Tryout</button>
+      <button class="btn btn-success mt-2 btn-pembahasan">Lihat Pembahasan</button>
+    `;
+  } else {
+    // jika belum, hanya tombol mulai
+    tombol = `<button class="btn btn-primary mt-2 btn-mulai">Mulai Tryout</button>`;
+  }
 
-if(hasilSnap.exists()){
+  div.innerHTML = `
+    <h5>${t.judul}</h5>
+    <small>${t.mapel||""}</small>
+    <br>
+    ${tombol}
+  `;
 
-tombol=`<button class="btn btn-success mt-2">Lihat Pembahasan</button>`;
+  tryoutList.appendChild(div);
 
-}else{
+  // EVENT MULAI TRYOUT
+  const btnMulai = div.querySelector(".btn-mulai");
+  btnMulai.onclick = (e) => {
+    e.stopPropagation(); // mencegah bubbling ke div
+    mulaiTryout(id, t);
+  }
 
-tombol=`<button class="btn btn-primary mt-2">Mulai Tryout</button>`;
-
-}
-
-div.innerHTML=`
-<h5>${t.judul}</h5>
-<small>${t.mapel||""}</small>
-<br>
-${tombol}
-`;
-
-div.onclick=()=>{
-
-if(hasilSnap.exists()){
-
-lihatPembahasan(id,t);
-
-}else{
-
-mulaiTryout(id,t);
-
-}
-
-};
-
-tryoutList.appendChild(div);
-
+  // EVENT LIHAT PEMBAHASAN (jika ada)
+  const btnPembahasan = div.querySelector(".btn-pembahasan");
+  if(btnPembahasan){
+    btnPembahasan.onclick = (e) => {
+      e.stopPropagation();
+      lihatPembahasan(id, t);
+    }
+  }
 }
 
 }
@@ -693,45 +694,32 @@ return Math.round((benar/soalList.length)*100);
 
 /* ================= SUBMIT TRYOUT ================= */
 
-async function submitTryout(){
+async function submitTryout() {
+  clearInterval(timer);
+  submitBtn.disabled = true;
 
-clearInterval(timer);
+  const nilai = hitungNilai();
 
-submitBtn.disabled=true;
+  const jawabanClean = {};
+  Object.keys(jawaban).forEach(k => {
+    jawabanClean[k] = jawaban[k] ?? null;
+  });
 
-const nilai=hitungNilai();
+  // Path sesuai rules baru
+  const hasilRef = doc(db, "hasil_tryout", currentUser.uid, "tryout", currentTryoutId);
 
-/* bersihkan jawaban supaya tidak ada undefined */
+  await setDoc(hasilRef, {
+    uid: currentUser.uid || "",
+    nama: namaUser || "",
+    tryoutId: currentTryoutId || "",
+    judul: currentTryoutData?.judul || "",
+    mapel: currentTryoutData?.mapel || "",
+    nilai: nilai || 0,
+    jawaban: jawabanClean,
+    createdAt: serverTimestamp()
+  });
 
-const jawabanClean = {};
-
-Object.keys(jawaban).forEach(k=>{
-jawabanClean[k] = jawaban[k] ?? null;
-});
-
-
-await setDoc(doc(db,"hasil_tryout",`${currentUser.uid}_${currentTryoutId}`),{
-
-uid: currentUser.uid || "",
-
-nama: namaUser || "",   // TAMBAHKAN INI
-
-tryoutId: currentTryoutId || "",
-
-judul: currentTryoutData?.judul || "",
-
-mapel: currentTryoutData?.mapel || "",
-
-nilai: nilai || 0,
-
-jawaban: jawabanClean,
-
-createdAt: serverTimestamp()
-
-});
-
-tampilkanHasil(nilai);
-
+  tampilkanHasil(nilai);
 }
 
 // TAMPILKAN HASIL
@@ -819,31 +807,34 @@ ${s.bahas || "Pembahasan belum tersedia"}
 `;
 
 }).join("");
+// Scroll ke reviewSoal, bukan ke atas halaman
+  const firstSoal = reviewSoal.querySelector(".soal-card");
+  if(firstSoal) {
+    firstSoal.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 // Setelah reviewSoal.innerHTML = ...
 if (window.MathJax) {
   MathJax.typesetPromise();
 }
 }
-async function lihatPembahasan(id,data){
+async function lihatPembahasan(id, data) {
+  const hasilRef = doc(db, "hasil_tryout", currentUser.uid, "tryout", id); // <-- ganti ini
+  const hasilSnap = await getDoc(hasilRef);
 
-const hasilRef = doc(db,"hasil_tryout",`${currentUser.uid}_${id}`);
-const hasilSnap = await getDoc(hasilRef);
+  if(!hasilSnap.exists()){
+    alert("Belum ada hasil tryout");
+    return;
+  }
 
-if(!hasilSnap.exists()){
-alert("Belum ada hasil tryout");
-return;
-}
+  const hasil = hasilSnap.data();
 
-const hasil=hasilSnap.data();
+  currentTryoutId = id;
+  currentTryoutData = data;
 
-currentTryoutId=id;
-currentTryoutData=data;
+  soalList = data.soal || [];
+  jawaban = hasil.jawaban || {};
 
-soalList=data.soal||[];
-jawaban=hasil.jawaban||{};
-
-tampilkanHasil(hasil.nilai);
-
+  tampilkanHasil(hasil.nilai);
 }
 
 function masukFullscreen(){
